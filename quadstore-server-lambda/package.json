@@ -1,0 +1,20 @@
+{
+  "name": "quadstore-server-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "build:db": "node create-sparql-db",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@comunica/actor-init-sparql": "^1.14.0",
+    "adm-zip": "^0.4.16",
+    "fs-extra": "^9.0.1",
+    "leveldown": "^5.6.0",
+    "n3": "git+https://github.com/uedayou/N3.js.git",
+    "quadstore": "^6.0.1"
+  }
+}

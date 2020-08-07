@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  quadstore-server-on-aws-serverless
+  
+Globals:
+  Function:
+    Timeout: 30
+  Api:
+    OpenApiVersion: 3.0.2
+    Cors: "'*'"
+
+Resources:
+  QuadstoreServerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: quadstore-server-lambda/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      MemorySize: 1024
+      Events:
+        JrsLodSparql:
+          Type: Api
+          Properties:
+            Path: /sparql
+            Method: get
+
+Outputs:
+  QuadstoreServerApi:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sparql"
+  QuadstoreServerFunctionArn:
+    Value: !GetAtt QuadstoreServerFunction.Arn
+  QuadstoreServerIamRole:
+    Value: !GetAtt QuadstoreServerFunctionRole.Arn
