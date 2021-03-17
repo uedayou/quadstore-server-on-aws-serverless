@@ -2,6 +2,7 @@
   "name": "quadstore-server-lambda",
   "version": "1.0.0",
   "description": "",
+  "author": "uedayou <yooueda@gmail.com> (https://uedayou.net/)",
   "main": "app.js",
   "scripts": {
     "build:db": "node create-sparql-db",
@@ -10,11 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@comunica/actor-init-sparql": "^1.14.0",
-    "adm-zip": "^0.4.16",
     "fs-extra": "^9.0.1",
     "leveldown": "^5.6.0",
-    "n3": "git+https://github.com/uedayou/N3.js.git",
-    "quadstore": "^6.0.1"
+    "n3": "^1.8.1",
+    "quadstore": "^8.0.0",
+    "quadstore-comunica": "^0.3.1",
+    "xml": "^1.0.1"
   }
 }

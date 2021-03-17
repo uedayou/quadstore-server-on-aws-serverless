@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs-extra');
-const AdmZip = require('adm-zip');
-const RdfStore = require('quadstore').RdfStore;
-const newEngine = require('@comunica/actor-init-sparql').newEngine;
 const leveldown = require('leveldown');
-const dataFactory = require('n3').DataFactory;
+const { DataFactory } = require('n3');
+const { newEngine } = require('quadstore-comunica');
+const { Quadstore } = require('quadstore');
+const utils = require('./utils');
 
 const dir = `sparql-db`;
 
@@ -43,33 +43,31 @@ exports.lambdaHandler = async (event, context) => {
       "Content-Type": contentType
     }
   }
-};
-
+}
 
 async function getSparqlResult(queryString, format) {
   let resultFormat = "application/sparql-results+json";
   let contentType = "application/json";
-  if (format=="xml") {
+  if (format.match(/xml/i)) {
     resultFormat = "application/sparql-results+xml";
     contentType = "text/xml";
   }
 
-  let store, result, body, statusCode = 400;
+  let store, body, statusCode = 400;
   try {
-    store = new RdfStore(
-      leveldown('/tmp/'+dir),
-      { dataFactory }
-    );
-    const myEngine = newEngine();
-    result = await myEngine.query(
-      queryString,
-      { sources: [store] }
-    );
-    const stream = await myEngine.resultToString(
-      result,
-      resultFormat
-    );
-    body = await getStringByReadString(stream.data);
+    store = new Quadstore({
+      backend: leveldown('/tmp/'+dir),
+      dataFactory: DataFactory,
+      comunica: newEngine(),
+    });
+    await store.open();
+    const results = await store.sparql(queryString);
+
+    if (format.match(/xml/i)) {
+      body = await utils.getXmlStringFronBindings(results);
+    } else {
+      body = utils.getJsonStringFromBindings(results);
+    }
     statusCode = 200;
   } catch(err) {
     console.error(err);
@@ -79,13 +77,4 @@ async function getSparqlResult(queryString, format) {
     if (store) await store.close();
   }
   return { body, contentType, statusCode };
-}
-
-function getStringByReadString(stream) {
-  return new Promise((resolve, reject)=>{
-    let data = "";
-    stream.on("data", chunk => data += chunk);
-    stream.on("end", () => resolve(data));
-    stream.on("error", error => reject(error));
-  });
 }
